@@ -24,4 +24,3 @@ def get_total_partials(expecteds, results):
     for i in range(0, len(expecteds)):
         total_partials = numpy.add(total_partials, get_partials(expecteds[i], results[i]))
     return total_partials
-        

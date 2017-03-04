@@ -31,7 +31,7 @@ nnet = Layers(Sigmoid, [3,3,3], Cost)
 '''expected = ([.95, .05])
 input = [184, 79]'''
 training_cycles = 100000
-learn_constant = .05
+learn_constant = .1
 print(nnet)
 
 print("initial result: " + str(nnet.get_results(func_inputs)))
@@ -49,7 +49,7 @@ for i in range(0, training_cycles):
 
 print("final result: " + str(result2))
 print("final cost: " + str(nnet.get_total_cost(func_outputs, result2)))
-    
+print(nnet)
     
     
     

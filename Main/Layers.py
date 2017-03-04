@@ -26,10 +26,23 @@ class Layers:
             self.layers[i].set_node_outputs()
         return self.layers[len(self.layers)-1].get_layer_outputs()
     
+    def get_results(self, mult_inputs):
+        outputs = []
+        for i in range(0, len(mult_inputs)):
+            outputs.append(self.get_result(mult_inputs[i]))
+        return tuple(outputs)
     
     def set_node_partials(self, expected, result):
         i = len(self.layers) - 2
         cost_partials = self.cost_func.get_partials(expected, result)
+        self.layers[len(self.layers) - 1].set_node_partials(None, cost_partials)
+        while i > 0:
+            self.layers[i].set_node_partials(self.layers[i+1], cost_partials)
+            i -= 1
+            
+    def set_multi_input_node_partials(self, expecteds, results):
+        i = len(self.layers) - 2
+        cost_partials = self.cost_func.get_total_partials(expecteds, results)
         self.layers[len(self.layers) - 1].set_node_partials(None, cost_partials)
         while i > 0:
             self.layers[i].set_node_partials(self.layers[i+1], cost_partials)
@@ -41,7 +54,10 @@ class Layers:
     
     def get_cost(self, expected, result):
         return self.cost_func.get_cost(expected, result)
-           
+    
+    def get_total_cost(self, expecteds, results):
+        return self.cost_func.get_total_cost(expecteds, results)
+    
     def reset(self):        
         for i in range(1, len(self.layers)):
             self.layers[i].reset_nodes()

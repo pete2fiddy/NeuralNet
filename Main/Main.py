@@ -18,7 +18,7 @@ func_inputs = []
 func_outputs = []
 num_funcs = 3
 for i in range(0, num_funcs):
-    func_inputs_temp, func_outputs_temp = get_random_function((-50, 50), 3, 3)
+    func_inputs_temp, func_outputs_temp = get_random_function((-50, 50), 10, 3)
     func_inputs.append(func_inputs_temp)
     func_outputs.append(func_outputs_temp)
 func_inputs = tuple(func_inputs)
@@ -27,10 +27,10 @@ func_outputs = tuple(func_outputs)
 print("inputs: " + str(func_inputs))
 print("outputs: " + str(func_outputs))
 
-nnet = Layers(Sigmoid, [3,3,3], Cost)
+nnet = Layers(Sigmoid, [10,8,3], Cost)
 '''expected = ([.95, .05])
 input = [184, 79]'''
-training_cycles = 100000
+training_cycles = 10000
 learn_constant = .1
 print(nnet)
 

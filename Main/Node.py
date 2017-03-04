@@ -62,7 +62,7 @@ class Node:
                 self.partials[i] = prev_layer[i].get_output()*self.get_deriv_at_output()#change in neuron output/change in weight
                 sum = 0
                 for j in range(0, len(next_layer)):
-                    sum += next_layer[i].get_partials()[self.index]
+                    sum += next_layer[j].get_partials()[self.index]
                 self.partials[i] *= sum
         
         

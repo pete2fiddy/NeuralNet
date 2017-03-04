@@ -20,11 +20,16 @@ class Layers:
             self.input_layer[i].set_output()
     
     def get_result(self, inputs):
-        self.set_input(inputs)
-        for i in range(1, len(self.layers)):
-            self.layers[i].set_node_sums()
-            self.layers[i].set_node_outputs()
-        return self.layers[len(self.layers)-1].get_layer_outputs()
+        outputs = []
+        for input_index in range(0, len(inputs)):
+            self.set_input(inputs[input_index][0])
+            for i in range(1, len(self.layers)):
+                self.layers[i].set_node_sums()
+                self.layers[i].set_node_outputs()
+            outputs.append(self.layers[len(self.layers)-1].get_layer_outputs())
+        return tuple(outputs)
+            
+        #return self.layers[len(self.layers)-1].get_layer_outputs()
     
     
     def set_node_partials(self, expected, result):

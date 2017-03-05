@@ -16,7 +16,7 @@ def get_random_function(input_range, dim_input, dim_output):
 
 
 def get_letter_closest_to_vector(vector, named_projections):
-    output = sorted( named_projections, key = lambda named_projection: numpy.linalg.norm( numpy.subtract(vector, named_projection.get_unit_mean()) ) )
+    output = sorted( named_projections, key = lambda named_projection: abs(numpy.linalg.norm( numpy.subtract(vector, named_projection.get_unit_mean()) ) - 1) )
     print("output: " + str(output))
     return output[0].get_name()
 
@@ -62,8 +62,8 @@ for i in range(0, len(named_projections)):
         outputs.append(iteroutputs[i])
 
 nn_trainer = NeuralNetTrainer(nnet, inputs, outputs)
-out_multiplier = 1#2.0
-out_shift = 0#-.5
+out_multiplier = 2.0
+out_shift = 0
 nn_trainer.train(training_cycles, learn_constant, vertical_output_shift = out_shift, output_multiplier = out_multiplier)
 
 num_wrong = 0
@@ -76,13 +76,13 @@ for i in range(0, len(named_projections)):
         print("distance between output and correct answer" + str(numpy.linalg.norm( numpy.subtract(iter_result, outputs[named_proj_index]) ) ))
         print("cost: " + str(Cost.get_cost(iter_result, outputs[named_proj_index])))
         #print("iter result: " + str(iter_result))
-        '''letter_closest_to_result = get_letter_closest_to_vector(iter_result, named_projections)
+        letter_closest_to_result = get_letter_closest_to_vector(iter_result, named_projections)
         if letter_closest_to_result != named_projections[i].get_name():
             num_wrong += 1
             #print("got one wrong :(")
         #else:
             #print("got one correct!")
-        '''
+        
         num_total += 1
         
 print("total error: " + str(float(num_wrong)/float(num_total)))

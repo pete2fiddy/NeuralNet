@@ -19,17 +19,17 @@ class Layers:
             self.input_layer[i].set_sum(inputs[i])
             self.input_layer[i].set_output()
     
-    def get_result(self, inputs):
+    def get_result(self, inputs, output_multiplier = 1, vertical_output_shift = 0):
         self.set_input(inputs)
         for i in range(1, len(self.layers)):
             self.layers[i].set_node_sums()
             self.layers[i].set_node_outputs()
-        return self.layers[len(self.layers)-1].get_layer_outputs()
+        return ((numpy.asarray(self.layers[len(self.layers)-1].get_layer_outputs()) + vertical_output_shift )*output_multiplier)
     
-    def get_results(self, mult_inputs):
+    def get_results(self, mult_inputs, output_multiplier = 1, vertical_output_shift = 0):
         outputs = []
         for i in range(0, len(mult_inputs)):
-            outputs.append(self.get_result(mult_inputs[i]))
+            outputs.append(self.get_result(mult_inputs[i],output_multiplier = output_multiplier, vertical_output_shift = vertical_output_shift))
         return tuple(outputs)
     
     def set_node_partials(self, expected, result):

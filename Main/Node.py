@@ -3,8 +3,8 @@ import random
 
 class Node:
     
-    RANDOM_BIAS_RANGE = (-5,5)
-    BIAS_RATE = 0.001
+    RANDOM_BIAS_RANGE = (-0,0)
+    BIAS_RATE = 0#0.001
     
     def __init__(self, activation_function_in, num_nodes_prev_layer, index):
         self.index = index

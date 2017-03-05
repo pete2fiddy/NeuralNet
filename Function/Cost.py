@@ -14,10 +14,8 @@ def get_total_cost(expecteds, results):
     return aggregate_error
 
 def get_partials(expected, results):
-    partials = numpy.zeros(numpy.asarray((expected)).shape[0])
-    for i in range(0, partials.shape[0]):
-        partials[i] = results[i] - expected[i]
-    return partials
+    return numpy.subtract(expected, results)
+    
 
 def get_total_partials(expecteds, results):
     total_partials = numpy.zeros(numpy.asarray((expecteds)).shape[1])

@@ -1,10 +1,11 @@
 import numpy
 import random
+from math import sqrt
 
 class Node:
     
-    RANDOM_BIAS_RANGE = (-5,5)
-    BIAS_RATE = 0.001
+    RANDOM_BIAS_RANGE = (-1,1)#(-5,5)
+    BIAS_RATE = 0.0000001
     
     def __init__(self, activation_function_in, num_nodes_prev_layer, index):
         self.index = index
@@ -13,18 +14,28 @@ class Node:
         
     def init_random_weights(self, num_nodes_prev_layer):
         self.weights = numpy.zeros((num_nodes_prev_layer))
+        
         for i in range(0, self.weights.shape[0]):
-            self.weights[i] = (2.0*random.random()-1) 
+            std_dev = sqrt(1.0/float(num_nodes_prev_layer))
+            self.weights[i] = random.gauss(0, std_dev)
+            #self.weights[i] = (2*random.random()-1) 
         if num_nodes_prev_layer != 0:
             self.bias_weight = (random.random() * (Node.RANDOM_BIAS_RANGE[1]-Node.RANDOM_BIAS_RANGE[0])) + Node.RANDOM_BIAS_RANGE[0]
         else:
             self.bias_weight = None
         
-    def set_output(self):
-        if self.bias_weight != None:
-            self.output = self.act_func.func(self.sum + self.bias_weight)
+    def set_output(self, num = None):
+        if num == None:
+            if self.bias_weight != None:
+                self.output = self.act_func.func(self.sum + self.bias_weight)
+            else:
+                self.output = self.act_func.func(self.sum)
         else:
-            self.output = self.act_func.func(self.sum) 
+            self.output = num
+    
+    
+    
+    
     
     def get_deriv_at_output(self):
         return self.act_func.dfunc(self.output)
@@ -54,6 +65,7 @@ class Node:
     
     def set_weight_partials(self, prev_layer, next_layer, cost_partials):
         self.partials = numpy.zeros((self.weights.shape[0]))
+        
         if next_layer == None:
             for i in range(0, self.partials.shape[0]):
                 self.partials[i] = prev_layer[i].get_output()*self.get_deriv_at_output()*cost_partials[self.index]
@@ -66,12 +78,14 @@ class Node:
                 self.partials[i] *= sum
         
         
+        
     def move_across_gradient(self, learn_constant):
-        for i in range(0, self.weights.shape[0]):
-            self.weights[i] -= self.partials[i] * learn_constant
+        self.weights = numpy.add(self.weights, numpy.asarray(self.partials)*learn_constant)
+        '''for i in range(0, self.weights.shape[0]):
+            self.weights[i] -= self.partials[i] * learn_constant'''
         if self.bias_weight != None:
             self.bias_weight += self.get_deriv_at_output() * Node.BIAS_RATE
-        
+    
         
     def reset_sums_outputs_and_partials(self):
         self.sum = 0

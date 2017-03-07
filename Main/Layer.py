@@ -13,7 +13,9 @@ class Layer:
             self.nodes = [Node(act_func, len(self.prev_layer), i) for i in range(0, num_nodes)]
         else:
             self.nodes = [Node(act_func, 0, i) for i in range(0, num_nodes)]
-    
+        
+        self.nodes = numpy.asarray(self.nodes, dtype = object)
+            
     def set_node_sums(self):
         prev_layer_outputs = self.prev_layer.get_layer_outputs()
         for i in range(0, len(self.nodes)):
@@ -35,6 +37,10 @@ class Layer:
         for i in range(0, len(self)):
             self[i].reset_sums_outputs_and_partials()
     
+    def set_dropout_nodes(self, dropout_rate):
+        for i in range(0, len(self)):
+            self[i].set_dropout(dropout_rate)
+    
     def get_layer_outputs(self):
         return numpy.asarray([self[i].get_output() for i in range(0, len(self))])#numpy.asarray([self.prev_layer[i].get_output() for i in range(0, len(self.prev_layer))])
     
@@ -42,7 +48,7 @@ class Layer:
         return self.cost_func.get_cost()
     
     def __len__(self):
-        return len(self.nodes)
+        return self.nodes.shape[0]
     
     def __getitem__(self, index):
         return self.nodes[index]

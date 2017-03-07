@@ -1,8 +1,10 @@
 from NNet.Main.Layers import Layers
 import NNet.Function.Sigmoid as Sigmoid
 import NNet.Function.Cost as Cost
+import NNet.Function.CrossEntropy as CrossEntropy
 import random
 import numpy
+import matplotlib.pyplot as pyplot
 
 
 def get_random_function(input_range, dim_input, dim_output):
@@ -18,9 +20,12 @@ def get_binary_add_functions(max_num):
         binary_num = "{0:03b}".format(i)
         binary_sum = "{0:03b}".format(i+1)
         print("num: " + str(binary_num) + " sum: " + str(binary_sum))
-        inputs.append(convert_string_to_vector(binary_num))
-        outputs.append(convert_string_to_vector(binary_sum))
-    return inputs, outputs
+        vec_inputs = numpy.asarray(convert_string_to_vector(binary_num))
+        vec_outputs = numpy.asarray(convert_string_to_vector(binary_sum))
+           
+        inputs.append(vec_inputs)
+        outputs.append(vec_outputs)
+    return numpy.asarray(inputs), numpy.asarray(outputs)
 
 
 def convert_string_to_vector(in_string):
@@ -29,61 +34,80 @@ def convert_string_to_vector(in_string):
         vector.append(int(in_string[i]))
     return vector
 
-'''func_inputs = []
-func_outputs = []
-num_funcs = 3
-for i in range(0, num_funcs):
-    func_inputs_temp, func_outputs_temp = get_random_function((-50, 50), 5, 5)
-    func_inputs.append(func_inputs_temp)
-    func_outputs.append(func_outputs_temp)
-func_inputs = tuple(func_inputs)
-func_outputs = tuple(func_outputs)'''
+def get_random_vector(size):
+    vector = [(random.random()-.5)*2 for i in range(0, size)]
+    return numpy.asarray(vector)
+
 func_inputs, func_outputs = get_binary_add_functions(8)
-
-
 
 print("inputs: " + str(func_inputs))
 print("outputs: " + str(func_outputs))
 
-nnet = Layers(Sigmoid, [3,25,3], Cost)
-'''expected = ([.95, .05])
-input = [184, 79]'''
-training_cycles = 10000
+nnet = Layers(Sigmoid, [3, 3, 3], Cost)
+max_training_cycles = 1000000
 learn_constant = .1
-cost_threshold = .3
+cost_threshold = .05
+dropout_rate = 0
+window_range = 250
+costs = []
+iterations = []
 print(nnet)
 
 print("initial result: " + str(nnet.get_results(func_inputs)))
 print("initial cost: " + str(nnet.get_total_cost(func_outputs, nnet.get_results(func_inputs))))
 
 stop_training = False
-for i in range(0, training_cycles):
-    if not stop_training:
-        for j in range(0, len(func_inputs)):
-            results = nnet.get_result(func_inputs[j])
-            cost = nnet.get_cost(func_outputs[j], results)
-            
-            nnet.set_node_partials(func_outputs[j], results)
-            nnet.move_across_gradient(learn_constant)
-            nnet.reset()
-            
-        if i % (training_cycles/100) == 0:
-            print(str(100 * float(i)/float(training_cycles)) + "% finished")
-            tot_results = nnet.get_results(func_inputs)
-            nnet.reset()
-            tot_cost = nnet.get_total_cost(func_outputs, tot_results)
-            print("cost: " + str(tot_cost))
-            if tot_cost < cost_threshold:
-                stop_training = True
+
+num_iter = 0
+pyplot.ion()
+
+pyplot.plot(costs, iterations)
+
+while stop_training == False and num_iter < max_training_cycles:
+    
+    for j in range(0, len(func_inputs)):
+        nnet.set_dropout_nodes(dropout_rate)
+        results = nnet.get_result(func_inputs[j])
+        cost = nnet.get_cost(func_outputs[j], results)
+        nnet.set_node_partials(func_outputs[j], results)
+        nnet.move_across_gradient(learn_constant)
+        nnet.reset()
+        
+    if num_iter %(float(max_training_cycles)/10000.0) == 0:
+        
+        tot_results1 = nnet.get_results(func_inputs)
+        tot_cost1 = nnet.get_total_cost(func_outputs, tot_results1)
+    
+        costs.append(tot_cost1)
+        iterations.append(num_iter)   
+        #pyplot.axis([iterations[len(iterations)-1] - window_range, iterations[len(iterations)-1],0, costs[0]]) 
+        pyplot.plot(iterations, costs)
+        pyplot.show()
+        pyplot.pause(0.000000000000001)
+        nnet.reset()
+        
+        if tot_cost1 < cost_threshold:
+            stop_training = True
+        
+        print("current cost: " + str(tot_cost1))
+        
+    num_iter += 1
+
 
 
 for i in range(0, 7):
     print("result of " + str(i) + ": " + str(convert_string_to_vector("{0:03b}".format(i))) + str(numpy.round(numpy.asarray(nnet.get_result(convert_string_to_vector("{0:03b}".format(i)))))))
-
+    
+while True: 
+    pyplot.show()
+    pyplot.pause(0.00000000001)
+    
+    
+'''
 print("final result: " + str(result2))
 print("final cost: " + str(nnet.get_total_cost(func_outputs, result2)))
 print(nnet)
-    
+'''
     
     
     

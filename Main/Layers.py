@@ -11,10 +11,10 @@ class Layers:
         
         self.input_layer = Layer(act_func, layer_dims[0], None)
         #self.layers.append(self.input_layer)
-        second_layer = Layer(act_func, layer_dims[0], self.input_layer)
+        second_layer = Layer(act_func, layer_dims[1], self.input_layer)
         self.layers.append(second_layer)
-        for i in range(1, len(layer_dims)):
-            self.layers.append(Layer(act_func, layer_dims[i], self.layers[i-1]))
+        for i in range(2, len(layer_dims)):
+            self.layers.append(Layer(act_func, layer_dims[i], self.layers[i-2]))
         print("len layers: " + str(len(self.layers)))
     
     def set_input(self, inputs):
@@ -61,6 +61,10 @@ class Layers:
     
     def get_total_cost(self, expecteds, results):
         return self.cost_func.get_total_cost(expecteds, results)
+    
+    def set_dropout_nodes(self, dropout_rate):
+        for i in range(1, len(self.layers) - 1):
+            self.layers[i].set_dropout_nodes(dropout_rate)
     
     def reset(self):   
              
